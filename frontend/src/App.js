@@ -11,10 +11,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Createpost from "./components/Createpost";
 import { LoginContext } from "./context/LoginContext";
+import Modal from "./components/Modal";
+
 
 
 
 function App() {
+  const [userLogin, setUserLogin] = useState(false);
+
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <BrowserRouter>
       <div className="App">
@@ -30,6 +36,8 @@ function App() {
 
         </Routes>
         <ToastContainer theme="dark" />
+        {modalOpen && <Modal setModalOpen={setModalOpen}></Modal>}
+
         </LoginContext.Provider>
 
 
@@ -39,3 +47,4 @@ function App() {
   );
 
 }
+export default App;
