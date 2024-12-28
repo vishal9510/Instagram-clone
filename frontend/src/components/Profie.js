@@ -4,6 +4,23 @@ import "./Profile.css";
 import ProfilePic from "./ProfilePic";
 
 export default function Profie() {
+  const [pic, setPic] = useState([]);
+
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/user/${JSON.parse(localStorage.getItem("user"))._id}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result)
+        setPic(result.post);
+        setUser(result.user)
+        console.log(pic);
+      });
+  }, []);
 
   return (
     <div className="profile">
