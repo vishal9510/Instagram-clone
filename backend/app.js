@@ -12,6 +12,8 @@ mongoose.connect(mongoUrl);
 app.use(express.json())
 require('./models/model')
 app.use(require("./routes/auth"))
+app.use(require("./routes/createPost"))
+
 mongoose.connection.on("connected", () => {
     console.log("successfully connected to mongo")
 })
