@@ -9,6 +9,8 @@ import SignIn from "./components/SignIn";
 import Profie from "./components/Profie";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Createpost from "./components/Createpost";
+import { LoginContext } from "./context/LoginContext";
 
 
 
@@ -16,7 +18,9 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <Navbar />
+      <LoginContext.Provider value={{ setUserLogin, setModalOpen }}>
+
+        <Navbar login={userLogin} />
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/signup" element={<SignUp />}></Route>
@@ -26,6 +30,8 @@ function App() {
 
         </Routes>
         <ToastContainer theme="dark" />
+        </LoginContext.Provider>
+
 
       </div>
     </BrowserRouter>
