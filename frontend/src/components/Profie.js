@@ -4,9 +4,14 @@ import "./Profile.css";
 import ProfilePic from "./ProfilePic";
 
 export default function Profie() {
+  var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
   const [pic, setPic] = useState([]);
   const [show, setShow] = useState(false)
   const [posts, setPosts] = useState([]);
+  const [changePic, setChangePic] = useState(false)
+  const [user, setUser] = useState("")
+
+
 
   const toggleDetails = (posts) => {
     if (show) {

@@ -3,9 +3,6 @@ import "./Createpost.css";
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 
-
-
-
 export default function Createpost() {
   const [body, setBody] = useState("");
   const [image, setImage] = useState("")
