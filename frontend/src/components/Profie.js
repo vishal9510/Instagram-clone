@@ -5,6 +5,25 @@ import ProfilePic from "./ProfilePic";
 
 export default function Profie() {
   const [pic, setPic] = useState([]);
+  const [show, setShow] = useState(false)
+  const [posts, setPosts] = useState([]);
+
+  const toggleDetails = (posts) => {
+    if (show) {
+      setShow(false);
+    } else {
+      setShow(true);
+      setPosts(posts);
+    }
+  };
+
+  const changeprofile = () => {
+    if (changePic) {
+      setChangePic(false)
+    } else {
+      setChangePic(true)
+    }
+  }
 
 
   useEffect(() => {
