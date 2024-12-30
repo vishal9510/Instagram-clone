@@ -11,6 +11,7 @@ app.use(cors())
 mongoose.connect(mongoUrl);
 app.use(express.json())
 require('./models/model')
+require('./models/post')
 app.use(require("./routes/auth"))
 app.use(require("./routes/createPost"))
 app.use(require("./routes/user"))
