@@ -8,6 +8,14 @@ export default function Home() {
 
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [comment, setComment] = useState("");
+  const [show, setShow] = useState(false);
+  const [item, setItem] = useState([]);
+
+    // Toast functions
+    const notifyA = (msg) => toast.error(msg);
+    const notifyB = (msg) => toast.success(msg);
+
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
@@ -28,6 +36,16 @@ export default function Home() {
       })
       .catch((err) => console.log(err));
   }, []);
+
+   // to show and hide comments
+   const toggleComment = (posts) => {
+    if (show) {
+      setShow(false);
+    } else {
+      setShow(true);
+      setItem(posts);
+    }
+  };
 
   const likePost = (id) => {
     fetch("http://localhost:5000/like", {
@@ -75,6 +93,36 @@ export default function Home() {
           }
         });
         setData(newData);
+        console.log(result);
+      });
+  };
+
+
+   // function to make comment
+   const makeComment = (text, id) => {
+    fetch("http://localhost:5000/comment", {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+      body: JSON.stringify({
+        text: text,
+        postId: id,
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        const newData = data.map((posts) => {
+          if (posts._id == result._id) {
+            return result;
+          } else {
+            return posts;
+          }
+        });
+        setData(newData);
+        setComment("");
+        notifyB("Comment posted");
         console.log(result);
       });
   };
