@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import logo from "../img/logo.png";
 import "./SignUp.css";
 import { Link, useNavigate } from "react-router-dom";
-
+import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
+import { LoginContext } from "../context/LoginContext";
+
 
 
 export default function SignUp() {
+  const { setUserLogin } = useContext(LoginContext)
+
   const navigate = useNavigate()
   const [name, setName] = useState("");
   const [email, setEmail] = useState("")
@@ -31,7 +36,7 @@ export default function SignUp() {
     }
 
     // Sending data to server
-    fetch("http://localhost:5000/signup", {
+    fetch("/signup", {
       method: "post",
       headers: {
         "Content-Type": "application/json"
@@ -50,6 +55,40 @@ export default function SignUp() {
         } else {
           notifyB(data.message)
           navigate("/signin")
+        }
+        console.log(data)
+      })
+  }
+
+  const continueWithGoogle = (credentialResponse) => {
+    // console.log(credentialResponse);
+    const jwtDetails = jwtDecode(credentialResponse.credential);
+    // console.log(jwtDetails);
+    fetch("/googleLogin", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: jwtDetails.name,
+        userName: jwtDetails,
+        email: jwtDetails.email,
+        email_verified: jwtDetails.email_verified,
+        clientId: credentialResponse.clientId,
+        Photo: jwtDetails.picture,
+      })
+    }).then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          notifyA(data.error)
+        } else {
+          notifyB("Signed In Successfully")
+          console.log(data)
+          localStorage.setItem("jwt", data.token)
+          localStorage.setItem("user", JSON.stringify(data.user))
+
+          setUserLogin(true)
+          navigate("/")
         }
         console.log(data)
       })
@@ -97,6 +136,15 @@ export default function SignUp() {
             cookies policy.
           </p>
           <input type="submit" id="submit-btn" value="Sign Up" onClick={() => { postData() }} />
+          <hr />
+          <GoogleLogin
+            onSuccess={credentialResponse => {
+              continueWithGoogle(credentialResponse)
+            }}
+            onError={() => {
+              console.log('Login Failed');
+            }}
+          />;
         </div>
         <div className="form2">
           Already have an account ?

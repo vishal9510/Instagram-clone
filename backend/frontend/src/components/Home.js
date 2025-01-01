@@ -4,25 +4,36 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-export default function MyFolliwngPost() {
+export default function Home() {
+  var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
   const [item, setItem] = useState([]);
+  let limit = 10;
+  let skip = 0;
+    // Toast functions
+    const notifyA = (msg) => toast.error(msg);
+    const notifyB = (msg) => toast.success(msg);
 
-  // Toast functions
-  const notifyA = (msg) => toast.error(msg);
-  const notifyB = (msg) => toast.success(msg);
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token) {
       navigate("./signup");
     }
+    fetchPosts()
 
-    // Fetching all posts
-    fetch("http://localhost:5000/myfollwingpost", {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+   
+  }, []);
+
+
+  const fetchPosts = () => {
+     // Fetching all posts
+     fetch(`/allposts?limit=${limit}&skip=${skip}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
@@ -30,13 +41,20 @@ export default function MyFolliwngPost() {
       .then((res) => res.json())
       .then((result) => {
         console.log(result);
-        setData(result);
+        setData((data) => [...data, ...result]);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }
 
-  // to show and hide comments
-  const toggleComment = (posts) => {
+  const handleScroll = (e) => {
+    if(document.documentElement.clientHeight + window.pageYOffset >= document.documentElement.scrollHeight){
+      skip = skip + 10;
+      fetchPosts();
+    } 
+  }
+
+   // to show and hide comments
+   const toggleComment = (posts) => {
     if (show) {
       setShow(false);
     } else {
@@ -46,31 +64,7 @@ export default function MyFolliwngPost() {
   };
 
   const likePost = (id) => {
-    fetch("http://localhost:5000/like", {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
-      },
-      body: JSON.stringify({
-        postId: id,
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        const newData = data.map((posts) => {
-          if (posts._id == result._id) {
-            return result;
-          } else {
-            return posts;
-          }
-        });
-        setData(newData);
-        console.log(result);
-      });
-  };
-  const unlikePost = (id) => {
-    fetch("http://localhost:5000/unlike", {
+    fetch("/like", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
@@ -94,9 +88,35 @@ export default function MyFolliwngPost() {
       });
   };
 
-  // function to make comment
-  const makeComment = (text, id) => {
-    fetch("http://localhost:5000/comment", {
+  const unlikePost = (id) => {
+    fetch("/unlike", {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+      body: JSON.stringify({
+        postId: id,
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        const newData = data.map((posts) => {
+          if (posts._id == result._id) {
+            return result;
+          } else {
+            return posts;
+          }
+        });
+        setData(newData);
+        console.log(result);
+      });
+  };
+
+
+   // function to make comment
+   const makeComment = (text, id) => {
+    fetch("/comment", {
       method: "put",
       headers: {
         "Content-Type": "application/json",
@@ -123,6 +143,8 @@ export default function MyFolliwngPost() {
       });
   };
 
+ 
+
   return (
     <div className="home">
       {/* card */}
@@ -133,7 +155,7 @@ export default function MyFolliwngPost() {
             <div className="card-header">
               <div className="card-pic">
                 <img
-                  src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8MnwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+                  src={posts.postedBy.Photo ? posts.postedBy.Photo : picLink}
                   alt=""
                 />
               </div>
